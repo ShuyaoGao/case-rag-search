@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>向量一致性自检</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 15px/1.6 system-ui, "Microsoft YaHei", sans-serif; margin: 0; padding: 16px; background: Canvas; color: CanvasText; }
+  table { border-collapse: collapse; width: 100%; max-width: 900px; }
+  td, th { border: 1px solid #8884; padding: 4px 8px; text-align: left; font-variant-numeric: tabular-nums; }
+  .ok { color: #1a7f4b; font-weight: 600; } .bad { color: #c43c3b; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>向量一致性自检</h1>
+<p>比较：浏览器里 transformers.js 算出的向量 vs. 离线 Python（onnxruntime）算出的向量（<code>data/selftest.json</code>）。余弦 &gt; 0.99 视为一致。</p>
+<div id="out">运行中……</div>
+<script type="module">
+import * as E from '../js/engine.js';
+const out = document.getElementById('out');
+try {
+  await E.loadAll(() => {});
+  const st = await (await fetch('../data/selftest.json')).json();
+  const rows = []; let minCos = 1, allIds = true;
+  for (const t of st) {
+    const v = await E.embed(t.text);
+    let d = 0; for (let i = 0; i < v.length; i++) d += v[i] * t.vec[i];
+    const ids = E.state.tokenizer.encode(t.text);
+    const same = ids.length === t.ids.length && ids.every((x, i) => x === t.ids[i]);
+    allIds &&= same; minCos = Math.min(minCos, d);
+    rows.push({ text: t.text, cos: d, same });
+  }
+  // 再抽查 5 个语料块：浏览器现场算的 vs 预存的 int8 向量
+  const pick = [0, 1, 1000, 3000, E.state.n - 1]; let minChunk = 1;
+  for (const i of pick) {
+    const c = E.state.chunks[i];
+    const v = await E.embed(E.chunkFullText(c));
+    const d = E.dot(v, E.chunkVec(i)); minChunk = Math.min(minChunk, d);
+    rows.push({ text: `语料块 #${i}：${E.chunkFullText(c).slice(0, 30)}…`, cos: d, same: null });
+  }
+  const pass = minCos > 0.99 && minChunk > 0.99 && allIds;
+  out.innerHTML = `<p id="verdict" class="${pass ? 'ok' : 'bad'}">${pass ? '通过' : '不通过'}：测试句最小余弦 ${minCos.toFixed(6)}，语料块最小余弦 ${minChunk.toFixed(6)}，token ids ${allIds ? '完全一致' : '有差异'}</p>
+  <table><tr><th>文本</th><th>余弦</th><th>token ids 一致</th></tr>${rows.map((r) => `<tr><td>${r.text}</td><td>${r.cos.toFixed(6)}</td><td>${r.same === null ? '—' : r.same ? '是' : '否'}</td></tr>`).join('')}</table>`;
+  window.__selftest = { pass, minCos, minChunk, allIds, rows };
+} catch (e) {
+  out.innerHTML = `<p class="bad">出错：${e.message}</p>`; window.__selftest = { error: String(e) }; console.error(e);
+}
+</script>
+</body>
+</html>

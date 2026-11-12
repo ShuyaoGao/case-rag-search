@@ -1,0 +1,45 @@
+MIT License
+
+Copyright (c) 2026 Shuyao Gao
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+------------------------------------------------------------------------------
+The MIT license above covers the code written for this project:
+index.html, style.css, js/, build/, tests/, start.bat, favicon.svg.
+
+Third-party components bundled in this repository keep their own licenses:
+
+* vendor/transformers/transformers.min.js
+  @huggingface/transformers 3.8.1 (Transformers.js), Apache License 2.0.
+  Full text: vendor/transformers/LICENSE
+
+* vendor/transformers/ort-wasm-simd-threaded.jsep.mjs / .wasm
+  onnxruntime-web 1.22.0-dev.20250409-89f8206ba4 (bundled with Transformers.js 3.8.1),
+  Copyright (c) Microsoft Corporation, MIT License.
+  Full text: vendor/transformers/LICENSE.onnxruntime-web
+
+* models/Xenova/bge-small-zh-v1.5/
+  ONNX conversion (Xenova/bge-small-zh-v1.5, revision 75c43b069aac4d136ba6bc1122f995fedcfd2781)
+  of BAAI/bge-small-zh-v1.5 by the Beijing Academy of Artificial Intelligence, MIT License.
+  https://huggingface.co/BAAI/bge-small-zh-v1.5
+
+* data/ (chunks.json, vectors, pca.json)
+  Derived from the Kaggle case library (https://shuyaogao.github.io/kaggle-case-library/).
+  Each case links to its original Kaggle notebook; the notebooks belong to their authors.

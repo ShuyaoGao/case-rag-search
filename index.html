@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>案例语义搜索</title>
+<meta name="description" content="在浏览器里离线运行的 RAG / 向量检索教学演示：用大白话提问，从 255 个 Kaggle 案例里找答案，并一步步看懂检索增强生成的原理。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script>
+  try { const t = localStorage.getItem('rag-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<div id="loadbar" class="loadbar" role="status" aria-live="polite">
+  <div class="loadbar-track"><div class="loadbar-fill" id="loadfill"></div></div>
+  <div class="loadbar-text" id="loadtext">正在加载……（第一次打开要下载约 55 MB：向量模型 24 MB + 推理引擎 21 MB + 案例数据 9 MB）</div>
+</div>
+
+<header class="top">
+  <div class="wrap top-row">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <div>
+        <h1>案例语义搜索</h1>
+        <p class="sub">用大白话提问，从 255 个 Kaggle 案例里找答案</p>
+      </div>
+    </div>
+    <button id="themeBtn" class="icon-btn" type="button" aria-label="切换深色/浅色">◐</button>
+  </div>
+  <nav class="wrap tabs" role="tablist">
+    <button role="tab" id="tab-search" class="tab active" aria-selected="true" data-mode="search">搜案例</button>
+    <button role="tab" id="tab-how" class="tab" aria-selected="false" data-mode="how">看原理</button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <form id="qform" class="qbox" autocomplete="off">
+    <input id="q" type="search" placeholder="用一句话说你想找什么，比如：怎么用机器学习发现信用卡盗刷" aria-label="输入问题" maxlength="200">
+    <button id="go" type="submit" class="go">搜索</button>
+  </form>
+  <div class="chips" id="examples" aria-label="示例问题"></div>
+
+  <!-- 模式一：搜案例 -->
+  <section id="mode-search" class="mode">
+    <div class="filters">
+      <div class="filter-row" id="trackFilters" aria-label="按大类筛选"></div>
+      <div class="filter-row">
+        <label for="fieldSel">领域</label>
+        <select id="fieldSel"><option value="">全部领域</option></select>
+        <label for="methodSel">检索方式</label>
+        <select id="methodSel">
+          <option value="hybrid" selected>混合（推荐）</option>
+          <option value="sem">只看意思（向量）</option>
+          <option value="kw">只看字面（关键词）</option>
+        </select>
+      </div>
+    </div>
+    <div id="status" class="status"></div>
+    <div id="results" class="results"></div>
+  </section>
+
+  <!-- 模式二：看原理 -->
+  <section id="mode-how" class="mode" hidden>
+    <div class="intro-card">
+      <p><b>RAG</b>（检索增强生成）= 先<b>查资料</b>，再<b>回答</b>。下面 8 步，用的就是你刚才输入的问题和真实数据，每一步都是这个页面刚刚真的算过的。</p>
+      <div class="pipeline" aria-hidden="true">
+        <span>1 切块</span><i>→</i><span>2 变向量</span><i>→</i><span>3 向量库</span><i>→</i><span>4 比相似</span><i>→</i><span>5 取前 k</span><i>→</i><span>6 对照关键词</span><i>→</i><span>7 拼提示词</span><i>→</i><span>8 生成答案</span>
+      </div>
+      <p class="muted" id="howQuery"></p>
+    </div>
+    <nav class="stepnav" id="stepnav"></nav>
+    <div id="steps"></div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>数据来自 <a href="https://shuyaogao.github.io/kaggle-case-library/" target="_blank" rel="noopener">Kaggle 案例库</a>（<a href="https://shuyaogao.github.io/kaggle-case-library/showcase.html" target="_blank" rel="noopener">总览</a> · <a href="https://shuyaogao.github.io/kaggle-case-library/routes.html" target="_blank" rel="noopener">学习路线</a>）。
+  模型 bge-small-zh-v1.5（量化版），在你的浏览器里运行，不上传任何内容。</p>
+</footer>
+
+<div id="tip" class="tip" hidden></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
